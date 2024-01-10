@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using UnityEngine;
+
+using Object = UnityEngine.Object;
 
 namespace DefaultNamespace
 {
@@ -14,10 +18,15 @@ namespace DefaultNamespace
 
         [SerializeField]
         private ParticlesConfig _particlesConfig;
-        
 
-        private readonly List<ITick> _tickable = new();
-        private readonly List<IStart> _startable = new();
+        [SerializeField]
+        private DistanceShowView _distanceShowView;
+
+
+        private readonly List<object> _objects = new();
+        private List<ITick> _tickable = new();
+        private List<IStart> _startable = new();
+        private List<IDisposable> _disposables = new();
 
 
         private void Awake()
@@ -38,9 +47,12 @@ namespace DefaultNamespace
                 [KeyCode.RightArrow] = Vector3.right,
             }, _secondCube);
 
-            var particlesController = new ParticlesController(_particlesConfig,first,second);
-            _startable.Add(particlesController);
-            _tickable.Add(particlesController);
+            _objects.Add(new ParticlesController(_particlesConfig, first, second));
+            _objects.Add(new DistanceController(first, second, _distanceShowView));
+
+            _tickable = _objects.OfType<ITick>().ToList();
+            _startable = _objects.OfType<IStart>().ToList();
+            _disposables = _objects.OfType<IDisposable>().ToList();
         }
 
         private void Start()
@@ -59,13 +71,27 @@ namespace DefaultNamespace
             }
         }
 
+        private void OnDestroy()
+        {
+            _tickable = null;
+            _startable = null;
+            for (var i = 0; i < _disposables.Count; i++)
+            {
+                _disposables[i].Dispose();
+                _disposables[i] = null;
+            }
+
+            _disposables = null;
+        }
+
         private BoxesModel CreateMovement(Dictionary<KeyCode, Vector3> dictionary, Transform firstCube)
         {
             var input = new InputController(dictionary);
             var boxModel = new BoxesModel(firstCube.position);
-            _startable.Add(new PositionSetController(input, boxModel, .05f));
-            _startable.Add(new CubesTranslator(boxModel, firstCube));
-            _tickable.Add(input);
+            _objects.Add(new PositionSetController(input, boxModel, .05f));
+            _objects.Add(new CubesTranslator(boxModel, firstCube));
+            _objects.Add(input);
+            _objects.Add(boxModel);
             return boxModel;
         }
     }
