@@ -1,0 +1,30 @@
+#pragma kernel cs_main
+
+struct mesh_data
+{
+    float3 start;
+    float3 end;
+    float3 random;
+    float2 time;
+};
+
+void rotate_2d(inout float2 v, const float r)
+{
+    float s, c;
+    sincos(r, s, c);
+    v = float2(v.x * c - v.y * s, v.x * s + v.y * c);
+}
+
+RWStructuredBuffer<mesh_data> data;
+float3 start_position;
+float3 end_position;
+
+[numthreads(64,1,1)]
+void cs_main(uint3 id : SV_DispatchThreadID)
+{
+    mesh_data mesh_data = data[id.x];
+
+    // First, let's handle the y axis rotation
+    data[id.x].start = start_position;
+    data[id.x].end = end_position;
+}

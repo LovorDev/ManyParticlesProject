@@ -23,10 +23,10 @@ Material:
     m_Ints: []
     m_Floats:
     - _CubeSize: 0.52
-    - _NoiseFreq: 1.17
-    - _NoiseSize: 4.15
+    - _NoiseFreq: 2.88
+    - _NoiseSize: 4.48
     - _RandomMp: 0.28
-    - _Speed: 1
+    - _Speed: 89.5
     - _amplitude: 0.56
     - _frequency: 2.94
     - _gain: 0.902

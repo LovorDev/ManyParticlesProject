@@ -62,16 +62,27 @@ Shader "CubeInstanced"
                 float3 color : TEXCOORD3;
             };
 
+            struct mesh_data
+            {
+                float3 start;
+                float3 end;
+                float3 random;
+                float2 time;
+            };
+
+            StructuredBuffer<mesh_data> data;
+
             varyings vert(attributes v, const uint instance_id : SV_InstanceID)
             {
-                float4 start = position_buffer_1[instance_id];
-                float4 end = position_buffer_2[instance_id];
-                float3 random = scale_buffer[instance_id];
+                float3 start = data[instance_id].start;
+                float3 end = data[instance_id].end;
+                float3 random = data[instance_id].random;
+                float2 time = data[instance_id].time;
 
-                const float t = repeat((_Time.x + start.w) * _Speed * end.w, 1);
+                const float t = repeat((_Time.x + time.x) * _Speed * time.y, 1);
 
                 float strength = 1 - pow(1 - abs(2 * t), 2);
-                float3 scaledVertex = v.vertex * end.w;
+                float3 scaledVertex = v.vertex * time.y;
                 const float3 world_start = start.xyz + scaledVertex;
                 const float3 world_end = end.xyz + scaledVertex;
                 float3 pos = lerp(world_start, world_end, t);
@@ -81,7 +92,7 @@ Shader "CubeInstanced"
                     strength +
                     offset * strength;
 
-                pos+= random * strength;
+                pos += random * strength;
                 varyings o;
                 o.vertex = UnityObjectToClipPos(float4(pos, 1));
                 o.diffuse = saturate(dot(v.normal, _WorldSpaceLightPos0.xyz));
