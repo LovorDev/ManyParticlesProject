@@ -27,6 +27,14 @@ namespace DefaultNamespace
         private List<ITick> _tickable = new();
         private List<IStart> _startable = new();
         private List<IDisposable> _disposables = new();
+        [SerializeField]
+        private Renderer[] _spheres;
+
+        [SerializeField]
+        private Texture[] _textures;
+
+        [SerializeField]
+        private GameObject _sphereParent;
 
 
         private void Awake()
@@ -48,7 +56,9 @@ namespace DefaultNamespace
             }, _secondCube);
 
             _objects.Add(new ParticlesController(_particlesConfig, first, second));
-            _objects.Add(new DistanceController(first, second, _distanceShowView));
+            var distanceController = new DistanceController(first, second, _distanceShowView);
+            _objects.Add(distanceController);
+            _objects.Add(new SpheresController(_spheres, _textures, distanceController, _sphereParent));
 
             _tickable = _objects.OfType<ITick>().ToList();
             _startable = _objects.OfType<IStart>().ToList();
