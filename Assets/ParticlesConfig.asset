@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 278954a40b8e4c26addeca5e934d0563, type: 3}
+  m_Name: ParticlesConfig
+  m_EditorClassIdentifier: 
+  _mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  _material: {fileID: 2100000, guid: db2d725104620f94abc2bb00b6f1518c, type: 2}
+  _count: 1000000
+  _timeDelay: 0.01
+  _randomScale: {x: 0.002, y: 0.03}
+  _compute: {fileID: 7200000, guid: fc1ad518ac5e73442a187c950d9d3dca, type: 3}

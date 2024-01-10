@@ -2,7 +2,8 @@ Shader "CubeInstanced"
 {
     Properties
     {
-        _FarColor("Far color", Color) = (.2, .2, .2, 1)
+        _FirstColor("Far color", Color) = (.2, .2, .2, 1)
+        _SecondColor("Far color", Color) = (.2, .2, .2, 1)
         _NoiseDirection("Noise Direction", Vector) = (.2, .2, .2)
         _NoiseSize("Noise Size", Float) = 1
         _NoiseFreq("Noise Freq", Float) = 1
@@ -36,16 +37,12 @@ Shader "CubeInstanced"
                 return frac(sin(dot(uv, float2(12.9898, 78.233))) * 43758.5453123);
             }
 
-            float4 _FarColor;
+            float4 _FirstColor;
+            float4 _SecondColor;
             float3 _NoiseDirection;
             float _NoiseSize;
             float _NoiseFreq;
             float _Speed;
-
-
-            StructuredBuffer<float4> position_buffer_1;
-            StructuredBuffer<float4> position_buffer_2;
-            StructuredBuffer<float3> scale_buffer;
 
             struct attributes
             {
@@ -68,6 +65,7 @@ Shader "CubeInstanced"
                 float3 end;
                 float3 random;
                 float2 time;
+                bool inverted;
             };
 
             StructuredBuffer<mesh_data> data;
@@ -96,7 +94,7 @@ Shader "CubeInstanced"
                 varyings o;
                 o.vertex = UnityObjectToClipPos(float4(pos, 1));
                 o.diffuse = saturate(dot(v.normal, _WorldSpaceLightPos0.xyz));
-                o.color = _FarColor;
+                o.color = data[instance_id].inverted ? _FirstColor : _SecondColor;
 
                 return o;
             }
