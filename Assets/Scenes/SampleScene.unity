@@ -5193,7 +5193,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1332334092}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.5, y: 0, z: 3}
+  m_LocalPosition: {x: 1.13, y: 0, z: -11.89}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5314,14 +5314,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  _material: {fileID: 2100000, guid: 3e9b018f2698ac54ea3f3aedec6d7874, type: 2}
-  _cubePrefab: {fileID: 4428571867330432345, guid: 6cfd3a52813937b4e9b2b6aec3a055e2, type: 3}
-  _count: 2000
+  _material: {fileID: 2100000, guid: db2d725104620f94abc2bb00b6f1518c, type: 2}
+  _count: 1000000
   _timeDelay: 0.01
   _startPoint: {fileID: 1332334096}
   _endPoint: {fileID: 1369442495}
-  _speedScale: 0.16
-  _noiseScale: 1
+  _randomScale: {x: 0.001, y: 0.02}
 --- !u!4 &1848387358
 Transform:
   m_ObjectHideFlags: 0

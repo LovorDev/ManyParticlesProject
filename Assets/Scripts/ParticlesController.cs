@@ -1,16 +1,14 @@
-﻿using UnityEngine;
+﻿using System.Threading.Tasks;
+
+using UnityEngine;
 
 namespace DefaultNamespace
 {
-    // [ExecuteInEditMode]
     public class ParticlesController : MonoBehaviour
     {
         [SerializeField] private Mesh _mesh;
         [SerializeField] private Material _material;
         
-        [SerializeField]
-        private Transform _cubePrefab;
-
         [SerializeField]
         private int _count;
 
@@ -24,68 +22,92 @@ namespace DefaultNamespace
         private Transform _endPoint;
 
         [SerializeField]
-        private float _speedScale = 1;
-
-        [SerializeField]
-        private float _noiseScale;
-
-        private Vector3[] _startPositions;
-        private Vector3[] _endPositions;
-        private float[] _delay;
-
-
-        private Vector3[] _spawnedCubes;
-        private Matrix4x4[] _matrices;
-        private RenderParams _renderParams;
+        private Vector2 _randomScale;
+        
+        private ComputeBuffer _argsBuffer;
+        private readonly uint[] _args = { 0, 0, 0, 0, 0 };
+        private ComputeBuffer _startPositionBuffer, _endPositionBuffer, _scaleBuffer;
+        private int _cachedMultiplier = 1;
+        private Vector4[] _positions1;
+        private Vector4[] _positions2;
 
         private void Start()
         {
-            _spawnedCubes = new Vector3[_count];
-            _startPositions = new Vector3[_count];
-            _endPositions = new Vector3[_count];
-            _delay = new float[_count];
-            _matrices = new Matrix4x4[_count];
-            
-            _renderParams = new RenderParams(_material);
-
-            Spawn();
+            _argsBuffer = new ComputeBuffer(1, _args.Length * sizeof(uint), ComputeBufferType.IndirectArguments);
+            UpdateBuffers();
         }
 
         private void Update()
         {
-            for (var i = 0; i < _spawnedCubes.Length; i++)
-            {
-                var (pos, rot) = CalculatePosition(_startPoint.position + _startPositions[i],
-                    _endPoint.position + _endPositions[i],
-                    (Time.time + _delay[i] * i) * _speedScale);
+            //todo - optimize it
+            // var start = _startPoint.position;
+            // var end = _endPoint.position;
+            // Parallel.For(0, _count, i =>
+            // {
+            //     _positions1[i].Set(start.x, start.y, start.z, _positions1[i].w);
+            //     _positions2[i].Set(end.x, end.y, end.z, _positions2[i].w);
+            // });
+            //
+            // _startPositionBuffer.SetData(_positions1);
+            // _endPositionBuffer.SetData(_positions2);
+            // _material.SetBuffer("position_buffer_1", _startPositionBuffer);
+            // _material.SetBuffer("position_buffer_2", _endPositionBuffer);
 
-                _matrices[i].SetTRS(pos, rot, Vector3.one * .5f);
-                _spawnedCubes[i] = pos;
-            }
-
-            Graphics.RenderMeshInstanced(_renderParams, _mesh, 0, _matrices);
+            Graphics.DrawMeshInstancedIndirect(_mesh, 0, _material, new Bounds(Vector3.zero, Vector3.one * 1000), _argsBuffer);
         }
-
-        [ContextMenu("Spawn")]
-        private void Spawn()
+        
+        private void UpdateBuffers()
         {
+            // Positions
+            _startPositionBuffer?.Release();
+            _endPositionBuffer?.Release();
+            _scaleBuffer?.Release();
+            _startPositionBuffer = new ComputeBuffer(_count, 16);
+            _endPositionBuffer = new ComputeBuffer(_count, 16);
+            _scaleBuffer = new ComputeBuffer(_count, 12);
+
+            _positions1 = new Vector4[_count];
+            _positions2 = new Vector4[_count];
+            var scale = new Vector3[_count];
+
             for (var i = 0; i < _count; i++)
             {
-                _startPositions[i] = Random.insideUnitSphere;
-                _endPositions[i] = Random.insideUnitSphere * .5f;
-                _delay[i] = Random.Range(_timeDelay * .8f, _timeDelay * 1.2f);
-                _spawnedCubes[i] = _startPoint.position + _startPositions[i];
-            }
-        }
+                _positions1[i]= _startPoint.position;
+                _positions2[i] = _endPoint.position;
 
-        private (Vector3 pos, Quaternion rot) CalculatePosition(Vector3 startPosition, Vector3 endPosition, float time)
+                var range = Random.Range(.9f, 1.1f);
+                _positions1[i].w = range * i * _timeDelay;
+                _positions2[i].w = Random.Range(_randomScale.x, _randomScale.y);
+                scale[i] = Random.insideUnitSphere;
+            }
+            
+
+            _startPositionBuffer.SetData(_positions1);
+            _endPositionBuffer.SetData(_positions2);
+            _scaleBuffer.SetData(scale);
+            _material.SetBuffer("position_buffer_1", _startPositionBuffer);
+            _material.SetBuffer("position_buffer_2", _endPositionBuffer);
+            _material.SetBuffer("scale_buffer", _scaleBuffer);
+
+            // Verts
+            _args[0] = _mesh.GetIndexCount(0);
+            _args[1] = (uint)_count;
+            _args[2] = _mesh.GetIndexStart(0);
+            _args[3] = _mesh.GetBaseVertex(0);
+
+            _argsBuffer.SetData(_args);
+        }
+        
+        private void OnDisable()
         {
-            var sin = Mathf.Repeat(time, 1f);
-            var strength = 1 - Mathf.Abs(2 * (sin - 0.5f));
-            var pos = Vector3.Lerp(startPosition, endPosition, sin);
-            pos += Mathf.PerlinNoise(time, time) * _noiseScale * strength *
-                   Vector3.Cross(endPosition - startPosition, Vector3.up);
-            return (pos, Quaternion.identity);
+            _startPositionBuffer?.Release();
+            _startPositionBuffer = null;
+
+            _endPositionBuffer?.Release();
+            _endPositionBuffer = null;
+
+            _argsBuffer?.Release();
+            _argsBuffer = null;
         }
     }
 }
