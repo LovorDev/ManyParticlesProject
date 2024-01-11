@@ -2,11 +2,12 @@ Shader "CubeInstanced"
 {
     Properties
     {
-        _FirstColor("Far color", Color) = (.2, .2, .2, 1)
-        _SecondColor("Far color", Color) = (.2, .2, .2, 1)
+        _FirstColor("First color", Color) = (.2, .2, .2, 1)
+        _SecondColor("Second color", Color) = (.2, .2, .2, 1)
         _NoiseDirection("Noise Direction", Vector) = (.2, .2, .2)
         _NoiseSize("Noise Size", Float) = 1
         _NoiseFreq("Noise Freq", Float) = 1
+        _NoiseFreqSpeed("Noise Freq Speed", Float) = 1
         _Speed("Speed", Float) = 1
     }
     SubShader
@@ -42,6 +43,7 @@ Shader "CubeInstanced"
             float3 _NoiseDirection;
             float _NoiseSize;
             float _NoiseFreq;
+            float _NoiseFreqSpeed;
             float _Speed;
 
             struct attributes
@@ -86,9 +88,8 @@ Shader "CubeInstanced"
                 float3 pos = lerp(world_start, world_end, t);
 
                 const float3 offset = cross(end - start, float3(-_NoiseDirection.y, -_NoiseDirection.x, 0));
-                pos += SimplexNoise(float2(t * _NoiseFreq, t * _Time.x * _NoiseFreq)) * _NoiseSize * _NoiseDirection *
-                    strength +
-                    offset * strength;
+                pos += SimplexNoise(float2(t * _NoiseFreq, t * _NoiseFreq + _Time.x * _NoiseFreqSpeed)) * _NoiseSize * _NoiseDirection *
+                    strength + offset * strength;
 
                 pos += random * strength;
                 varyings o;

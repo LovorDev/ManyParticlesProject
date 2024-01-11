@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   _material: {fileID: 2100000, guid: db2d725104620f94abc2bb00b6f1518c, type: 2}
-  _count: 1000000
+  _count: 2000000
   _timeDelay: 0.01
-  _randomScale: {x: 0.002, y: 0.03}
+  _randomScale: {x: 0.002, y: 0.01}
   _compute: {fileID: 7200000, guid: fc1ad518ac5e73442a187c950d9d3dca, type: 3}

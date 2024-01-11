@@ -6,9 +6,10 @@ namespace DefaultNamespace
 {
     public class PositionSetController : IStart
     {
-        private InputController _inputController;
-        private BoxesModel _boxesModel;
-        private float _speed;
+        private readonly InputController _inputController;
+        private readonly BoxesModel _boxesModel;
+        private readonly float _speed;
+
         public PositionSetController(InputController inputController, BoxesModel boxesModel, float speed)
         {
             _inputController = inputController;

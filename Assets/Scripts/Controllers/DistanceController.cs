@@ -8,8 +8,8 @@ namespace DefaultNamespace
 {
     public class DistanceController : IStart
     {
-        public event Action<float> DistanceChanged = _ => { }; 
-        
+        public event Action<float> DistanceChanged = _ => { };
+
         private readonly BoxesModel _firstBoxesModel;
         private readonly BoxesModel _secondBoxesModel;
         private readonly DistanceShowView _showView;

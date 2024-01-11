@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using Cysharp.Threading.Tasks;
 
@@ -7,18 +6,19 @@ using UnityEngine;
 
 namespace DefaultNamespace
 {
-    public class InputController: ITick
+    public class InputController : ITick
     {
         public AsyncReactiveProperty<Vector3> AxisTriggered { get; } = new(default);
-        private Vector3 _pressedKeys = new();
+        private Vector3 _pressedKeys;
 
-        private KeyCode[] _possibleKeys = new[]
+        private KeyCode[] _possibleKeys =
         {
             KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.D,
             KeyCode.UpArrow, KeyCode.LeftArrow, KeyCode.DownArrow, KeyCode.RightArrow,
         };
 
-        private Dictionary<KeyCode, Vector3> _keyMapBinding;
+        private readonly Dictionary<KeyCode, Vector3> _keyMapBinding;
+
         public InputController(Dictionary<KeyCode, Vector3> keyMapBinding)
         {
             _keyMapBinding = keyMapBinding;
@@ -26,7 +26,7 @@ namespace DefaultNamespace
 
         public void Tick()
         {
-            _pressedKeys.Set(0,0,0);
+            _pressedKeys.Set(0, 0, 0);
             foreach (var keyCode in _keyMapBinding)
             {
                 if (Input.GetKey(keyCode.Key))
@@ -40,10 +40,5 @@ namespace DefaultNamespace
                 AxisTriggered.Value = _pressedKeys;
             }
         }
-    }
-
-    public interface ITick
-    {
-        public void Tick();
     }
 }

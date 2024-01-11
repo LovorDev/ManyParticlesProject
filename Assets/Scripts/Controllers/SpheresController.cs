@@ -7,9 +7,10 @@ namespace DefaultNamespace
 {
     public class SpheresController : IStart, IDisposable
     {
+        private const float DistanceToShowSpheres = 2;
         private static readonly int Textures = Shader.PropertyToID("_Textures");
         private static readonly int TextureIndex = Shader.PropertyToID("_TextureIndex");
-        
+
         private readonly Renderer[] _spheres;
         private readonly Texture[] _texture;
         private readonly DistanceController _distanceController;
@@ -33,15 +34,9 @@ namespace DefaultNamespace
             SetUpTextures();
         }
 
-
-        public void Dispose()
-        {
-            _distanceController.DistanceChanged -= OnDistanceChanged;
-        }
-
         private void OnDistanceChanged(float distance)
         {
-            var enabling = distance < 10;
+            var enabling = distance < DistanceToShowSpheres;
             if ((enabling && _enabled) || (!enabling && !_enabled))
             {
                 return;
@@ -74,6 +69,12 @@ namespace DefaultNamespace
                 propertyBlock.SetFloat(TextureIndex, i);
                 _spheres[i].SetPropertyBlock(propertyBlock);
             }
+        }
+
+
+        public void Dispose()
+        {
+            _distanceController.DistanceChanged -= OnDistanceChanged;
         }
     }
 }
